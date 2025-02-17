@@ -4,6 +4,66 @@ A Python tool for validating UDP packets following the FreeD protocol, commonly 
 
 ## Installation
 
+### Using Docker
+
+```bash
+# Pull and run the latest version
+docker pull koensayr/freed
+docker run -p 6000:6000/udp koensayr/freed
+
+# Or build from source
+docker build --target prod -t freed .
+docker run -p 6000:6000/udp freed
+```
+
+Development with local file mounting:
+```bash
+# Build development image
+docker build --target dev -t freed-dev .
+
+# Run with local directory mounted
+docker run -v $(pwd):/app -p 6000:6000/udp freed-dev
+```
+
+Specific command examples:
+```bash
+# Run test suite
+docker run freed test --network
+
+# Generate test pattern
+docker run freed simulate circle
+
+# Analyze log file (mounting local directory)
+docker run -v $(pwd):/data freed analyze /data/freed_packets.csv
+```
+
+### Using Docker Compose
+
+Multiple components can be run together using Docker Compose:
+
+```bash
+# Start validator with simulator
+docker compose up validator simulator
+
+# Development environment with hot reload
+docker compose up dev
+
+# Run multiple simulators
+docker compose up validator
+docker compose up --scale simulator=3 simulator
+
+# Analyze log files
+mkdir -p data
+cp freed_packets.csv data/
+docker compose --profile analysis up analyzer
+```
+
+Common Docker Compose patterns:
+- `validator + simulator`: Test packet generation and validation
+- `dev`: Development environment with live code changes
+- `validator + multiple simulators`: Load testing
+- `analyzer`: Batch processing of log files
+
 ### Using Homebrew (macOS)
 
 ```bash

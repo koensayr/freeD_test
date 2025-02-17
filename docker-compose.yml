@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  # Main validator service
+  validator:
+    build:
+      context: .
+      target: prod
+    ports:
+      - "6000:6000/udp"
+    healthcheck:
+      test: ["CMD", "freed", "--version"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+
+  # Pattern simulator service
+  simulator:
+    build:
+      context: .
+      target: prod
+    command: simulate circle --ip validator
+    depends_on:
+      validator:
+        condition: service_healthy
+
+  # Development environment
+  dev:
+    build:
+      context: .
+      target: dev
+    volumes:
+      - .:/app
+    ports:
+      - "6000:6000/udp"
+    command: validate
+    environment:
+      - PYTHONPATH=/app
+      - PYTHONDONTWRITEBYTECODE=1
+      - PYTHONUNBUFFERED=1
+
+  # Data analysis service
+  analyzer:
+    build:
+      context: .
+      target: prod
+    volumes:
+      - ./data:/data
+    command: analyze /data/freed_packets.csv
+    profiles:
+      - analysis
+
+# Usage examples in comments:
+#
+# Start validator with simulator:
+#   docker compose up validator simulator
+#
+# Development environment:
+#   docker compose up dev
+#
+# Run analysis on log file:
+#   docker compose --profile analysis up analyzer
+#
+# Scale simulator instances:
+#   docker compose up validator
+#   docker compose up --scale simulator=3 simulator
