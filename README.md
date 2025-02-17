@@ -4,11 +4,57 @@ A Python tool for validating UDP packets following the FreeD protocol, commonly 
 
 ## Installation
 
-1. Clone the repository
-2. Install dependencies:
+### Using Homebrew (macOS)
+
+```bash
+# Add the tap
+brew tap koensayr/freed_test
+
+# Install the package
+brew install freed-validator
+```
+
+### From Source
+
+1. Clone the repository:
    ```bash
-   pip install -r requirements.txt
+   git clone https://github.com/koensayr/freed_test.git
+   cd freed_test
    ```
+
+2. Install using pip:
+   ```bash
+   pip install .
+   ```
+
+### Command Line Usage
+
+After installation, use the `freed` command with various subcommands:
+
+```bash
+# Run the UDP packet validator
+freed validate --ip 0.0.0.0 --port 6000
+
+# Run the test suite
+freed test [--network]
+
+# Replay recorded packet data
+freed replay freed_packets.csv
+
+# Generate test patterns
+freed simulate circle
+freed simulate figure8
+freed simulate oscillate
+
+# Analyze recorded data
+freed analyze freed_packets.csv
+```
+
+For help on any command:
+```bash
+freed --help
+freed <command> --help
+```
 
 ## Overview
 
